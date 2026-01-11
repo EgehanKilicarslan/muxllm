@@ -1,0 +1,49 @@
+services:
+  # 🧠 AI BRAIN (gRPC Server)
+  backend-python:
+    build:
+      context: ./backend-python
+      dockerfile: Dockerfile
+    container_name: muxllm-python-service
+    ports:
+      - "50051:50051" # gRPC Server
+    env_file:
+      - .env
+    volumes:
+      - models:/home/appuser/.cache/models
+      - uploads:/tmp/muxllm/uploads
+    networks:
+      - muxllm-network
+    restart: unless-stopped
+
+  # 🌐 ORCHESTRATOR (HTTP + gRPC Server)
+  backend-go:
+    build:
+      context: ./backend-go
+      dockerfile: Dockerfile
+    container_name: muxllm-go-gateway
+    ports:
+      - "8080:8080" # HTTP API
+      - "50052:50052" # gRPC Server (Python -> Go)
+    environment:
+      - GIN_MODE=release
+    env_file:
+      - .env
+    volumes:
+      - uploads:/tmp/muxllm/uploads
+    depends_on:
+      backend-python:
+        condition: service_started
+    networks:
+      - muxllm-network
+    restart: unless-stopped
+
+volumes:
+  models:
+    driver: local
+  uploads:
+    driver: local
+
+networks:
+  muxllm-network:
+    driver: bridge
