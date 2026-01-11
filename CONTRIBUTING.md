@@ -91,8 +91,8 @@ Before your contribution can be accepted, you must agree to our [Contributor Lic
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/EgehanKilicarslan/MuxLLM
-cd MuxLLM
+git clone https://github.com/EgehanKilicarslan/muxllm
+cd muxllm
 ```
 
 ### 2. Install Git Hooks
